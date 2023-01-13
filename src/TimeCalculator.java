@@ -22,6 +22,7 @@ public class TimeCalculator {
     }
     float calculateTime(){
         String[] words = this.text.split(" ");
+        System.out.println(words.length);
         float nWords = words.length;
         return nWords / this.wpm.WPM * 60;
     }
@@ -33,20 +34,29 @@ public class TimeCalculator {
     }
 
     boolean secondStep(){
-        if (this.s == 0) {
-            if (this.m == 0) {
-                if (this.h == 0) {
-                     return true;
-                } else {
-                    this.h--;
-                    this.m = 59;
-                    this.h = 59;
+        switch(this.s){
+            case 0:
+                switch(this.m){
+                    case 0:
+                        switch(this.h){
+                            case 0:
+                                return true;
+                            default:
+                                System.out.println("Tolta un'ora");
+                                this.h--;
+                                this.m = 59;
+                                this.s = 59;
+                        }
+                        break;
+                    default:
+                        System.out.println("Tolto un minuto");
+                        this.m--;
+                        this.s = 59;
                 }
-            }
-            this.m--;
-            this.s = 59;
+                break;
+            default:
+                this.s--;
         }
-        this.s--;
         return false;
     }
 

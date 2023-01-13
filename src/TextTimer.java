@@ -1,12 +1,17 @@
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.stage.Stage;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import javax.script.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import java.net.URL;
+
+import javafx.scene.media.MediaPlayer;
 
 @SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "RedundantExplicitVariableType"})
 public class TextTimer extends  TimeCalculator{
@@ -86,6 +91,24 @@ public class TextTimer extends  TimeCalculator{
         stopBtn.addActionListener(this::stopTime);
         frame.add(stopBtn);
         stopBtn.setEnabled(false);
+
+        JButton exeBtn = new JButton("Execute");
+        exeBtn.setBounds(210, 620, 90, 30);
+        exeBtn.addActionListener(this::executePythonClick);
+        frame.add(exeBtn);
+    }
+
+    private void executePythonClick(ActionEvent event) {
+        try{
+            Process p = Runtime.getRuntime().exec("python test.py");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line = "";
+            while((line = reader.readLine()) != null){
+                System.out.println(line + "\n");
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private void stopTime(ActionEvent event) {
@@ -113,7 +136,7 @@ public class TextTimer extends  TimeCalculator{
                 trayIcon.setImageAutoSize(true);
                 tray.add(trayIcon);
                 trayIcon.displayMessage("Timer", "Tempo scaduto!", TrayIcon.MessageType.INFO);
-
+                start();
             } catch(Exception ex){
                 ex.printStackTrace();
             }
@@ -128,9 +151,9 @@ public class TextTimer extends  TimeCalculator{
         int s = timeCalculator.s;
         StringBuilder builder = new StringBuilder();
         if(h<10)
-            builder.append("0"+m);
+            builder.append("0"+h);
         else
-            builder.append(m);
+            builder.append(h);
         builder.append(":");
         if(m < 10)
             builder.append("0"+m);
@@ -149,10 +172,10 @@ public class TextTimer extends  TimeCalculator{
         seconds = timeCalculator.calculateTime();
         int s = (int)seconds % 60;
         int h = (int)seconds / 60;
-        int m = h % 6;
+        int m = h % 60;
         h = h / 60;
         timeCalculator.setTime(h, m ,s);
-        timeTimer = new Timer((int)seconds*100, this::updateTime);
+        timeTimer = new Timer(1000, this::updateTime);
         updateTimer();
     }
 
@@ -180,7 +203,10 @@ public class TextTimer extends  TimeCalculator{
         updateSettings();
     }
 
-
+    public void start(){
+        AudioClip ac = new AudioClip(new File("C:/Users/39353/Documents/TextTimer/kil.wav").toURI().toString());
+        ac.play();
+    }
 
     public void updateSettings(){
         JSONObject settingsTxt = new JSONObject();
