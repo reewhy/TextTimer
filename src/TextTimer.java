@@ -20,6 +20,7 @@ public class TextTimer extends  TimeCalculator{
     JButton fastBtn;
     JButton mediumBtn;
     JButton slowBtn;
+    JToggleButton toggleButton;
     JLabel timer;
     Timer timeTimer;
     JButton startBtn;
@@ -49,6 +50,7 @@ public class TextTimer extends  TimeCalculator{
         // Create buttons
         JButton btn = new JButton("Calcola");
         JButton exeBtn = new JButton("Get text from photo");
+        toggleButton = new JToggleButton("Punctuation");
         fastBtn = new JButton("FAST");
         mediumBtn = new JButton("MEDIUM");
         slowBtn = new JButton("SLOW");
@@ -82,6 +84,7 @@ public class TextTimer extends  TimeCalculator{
         fastBtn.setBounds(580 ,520,90, 30);
         mediumBtn.setBounds(480, 520, 90, 30);
         slowBtn.setBounds(380, 520, 90, 30);
+        toggleButton.setBounds(545, 620, 130, 30);
 
         // Add action listeners
         btn.addActionListener(this::calculateTime);
@@ -93,6 +96,7 @@ public class TextTimer extends  TimeCalculator{
         exeBtn.addActionListener(this::executePythonClick);
 
         // Add components to the frame
+        frame.add(toggleButton);
         frame.add(scroll);
         frame.add(btn);
         frame.add(fastBtn);
@@ -140,7 +144,7 @@ public class TextTimer extends  TimeCalculator{
             Process p = Runtime.getRuntime().exec("python test.py");
             // Create a reader
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = "";
+            String line;
             StringBuilder finalText = new StringBuilder();
             // Get the result of the python code
             while((line = reader.readLine()) != null){
@@ -221,7 +225,7 @@ public class TextTimer extends  TimeCalculator{
         // Set the time calculator text to the text area
         timeCalculator.setText(textArea.getText());
         // Obtain how much seconds you need to read that
-        seconds = timeCalculator.calculateTime();
+        seconds = timeCalculator.calculateTime(toggleButton.isSelected());
         // Convert it from seconds to HH/mm/ss
         int s = (int)seconds % 60;
         int h = (int)seconds / 60;

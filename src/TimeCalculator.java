@@ -1,5 +1,3 @@
-import java.sql.Time;
-
 public class TimeCalculator {
     String text;
     TimeCalculaterWPM wpm = TimeCalculaterWPM.SLOW;
@@ -10,7 +8,7 @@ public class TimeCalculator {
         MEDIUM(250),
         SLOW(200);
         public final int WPM;
-        private TimeCalculaterWPM(int WPM){
+        TimeCalculaterWPM(int WPM){
             this.WPM = WPM;
         }
     }
@@ -24,11 +22,23 @@ public class TimeCalculator {
         this.text = newText;
     }
     // Calculate how much seconds you need to read the text
-    float calculateTime(){
+    float calculateTime(boolean pointsAndCommas){
+        float expressionSeconds = 0;
         String[] words = this.text.split(" ");
         System.out.println(words.length);
         float nWords = words.length;
-        return nWords / this.wpm.WPM * 60;
+        if(pointsAndCommas){
+            for(String word: words){
+                char[] characters = word.toCharArray();
+                for(char character: characters){
+                    switch (character) {
+                        case '.', '?' -> expressionSeconds += 2;
+                        case ',' -> expressionSeconds += 1;
+                    }
+                }
+            }
+        }
+        return nWords / this.wpm.WPM * 60 + expressionSeconds * this.wpm.WPM/1000;
     }
     // Change the time
     void setTime(int hour, int minute, int second){
@@ -38,28 +48,23 @@ public class TimeCalculator {
     }
     // Decrease the time by one second
     boolean secondStep(){
-        switch(this.s){
-            case 0:
-                switch(this.m){
-                    case 0:
-                        switch(this.h){
-                            case 0:
-                                return true;
-                            default:
-                                System.out.println("Tolta un'ora");
-                                this.h--;
-                                this.m = 59;
-                                this.s = 59;
-                        }
-                        break;
-                    default:
-                        System.out.println("Tolto un minuto");
-                        this.m--;
-                        this.s = 59;
+        if (this.s == 0) {
+            if (this.m == 0) {
+                if (this.h == 0) {
+                    return true;
+                } else {
+                    System.out.println("Tolta un'ora");
+                    this.h--;
+                    this.m = 59;
+                    this.s = 59;
                 }
-                break;
-            default:
-                this.s--;
+            } else {
+                System.out.println("Tolto un minuto");
+                this.m--;
+                this.s = 59;
+            }
+        } else {
+            this.s--;
         }
         return false;
     }
