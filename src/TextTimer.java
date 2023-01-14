@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 @SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "RedundantExplicitVariableType"})
 public class TextTimer extends  TimeCalculator{
@@ -122,26 +120,16 @@ public class TextTimer extends  TimeCalculator{
     }
 
     private void executePythonClick(ActionEvent event) {
+        File selectedFile = new File("file.png");
         // Get the file to open
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(null);
         if(result == JFileChooser.APPROVE_OPTION){
-            File selectedFile = fileChooser.getSelectedFile();
-            // Create a new png file
-            File newFile = new File("file.png");
-            try {
-                if (newFile.createNewFile()) {
-                    System.out.println("File creato");
-                }
-                // Copy the select file to the new file
-                Files.copy(selectedFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            selectedFile = fileChooser.getSelectedFile();
         }
         try{
             // Create a new process
-            Process p = Runtime.getRuntime().exec("python test.py");
+            Process p = Runtime.getRuntime().exec("python test.py \"" + selectedFile.toPath() + "\"");
             // Create a reader
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
@@ -152,7 +140,17 @@ public class TextTimer extends  TimeCalculator{
                 finalText.append(line);
             }
             // Set the area text to the result of python code
-            textArea.setText(finalText.toString());
+            if (!textArea.getText().equals("")) {
+                int input = JOptionPane.showConfirmDialog(null, "Vuoi sostituire il testo già presente?");
+                if (input == 0 || input == 2)
+                    textArea.setText(finalText.toString());
+                else{
+                    String finalString = textArea.getText() + "\n" +
+                            finalText;
+                    textArea.setText(finalString);
+                }
+            } else
+                textArea.setText(finalText.toString());
         }catch(Exception ex){
             ex.printStackTrace();
         }
